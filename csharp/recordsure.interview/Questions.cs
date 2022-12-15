@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Linq;
 
-namespace recordsure.interview {
+namespace recordsure.interview
+{
     public class Questions {
         /// <summary>
-        /// Given an enumerable of strings, attempt to parse each string and if
-        /// it is an integer, add it to the returned enumerable.
+        /// Given an enumerable of strings, 
+        /// 
+        /// attempt to parse each string and 
+        /// if it is an integer, 
+        /// 
+        /// add it to the returned enumerable.
         ///
+        /// 
         /// For example:
-        ///
         /// ExtractNumbers(new List<string> { "123", "hello", "234" });
         ///
         /// ; would return:
@@ -19,10 +24,21 @@ namespace recordsure.interview {
         ///   234
         /// }
         /// </summary>
-        /// <param name="source">An enumerable containing words</param>
-        /// <returns></returns>
-        public IEnumerable<int> ExtractNumbers(IEnumerable<string> source) {
-            throw new NotImplementedException();
+        /// <param name="strings">An enumerable containing words</param>
+        /// <returns> List of numbers. </returns>
+        public IEnumerable<int> ExtractNumbers(IEnumerable<string> strings) 
+        {
+            var numbers = new List<int>();
+
+            foreach (var stringItem in strings)
+            {
+                var isInteger = int.TryParse(stringItem, out var number);
+
+                if (isInteger)
+                    numbers.Add(number);
+            }
+
+            return numbers;
         }
 
         /// <summary>
@@ -63,11 +79,16 @@ namespace recordsure.interview {
         ///
         /// ; would return "wandering" as the longest common word.
         /// </summary>
-        /// <param name="first">First list of words</param>
-        /// <param name="second">Second list of words</param>
-        /// <returns></returns>
-        public string LongestCommonWord(IEnumerable<string> first, IEnumerable<string> second) {
-            throw new NotImplementedException();
+        /// <param name="firstList">First list of words</param>
+        /// <param name="secondList">Second list of words</param>
+        /// <returns> Longest common word. </returns>
+        public string LongestCommonWord(IEnumerable<string> firstList, IEnumerable<string> secondList) 
+        {
+            var longestCommonWord = firstList.Intersect(secondList)
+                                             .OrderByDescending(text => text.Length)
+                                             .FirstOrDefault();
+
+            return longestCommonWord;
         }
 
         /// <summary>
@@ -81,9 +102,10 @@ namespace recordsure.interview {
         /// ; would return 10.00;
         /// </summary>
         /// <param name="km">distance in kilometers</param>
-        /// <returns></returns>
-        public double DistanceInMiles(double km) {
-            throw new NotImplementedException();
+        /// <returns> The distance in miles. </returns>
+        public double DistanceInMiles(double km) 
+        {
+            return km / 1.6;
         }
 
         /// <summary>
@@ -97,9 +119,10 @@ namespace recordsure.interview {
         /// ; would return 16.00;
         /// </summary>
         /// <param name="miles">distance in miles</param>
-        /// <returns></returns>
-        public double DistanceInKm(double miles) {
-            throw new NotImplementedException();
+        /// <returns> The distance in kilometers. </returns>
+        public double DistanceInKm(double miles)
+        {
+            return miles * 1.6;
         }
 
         /// <summary>
@@ -120,13 +143,16 @@ namespace recordsure.interview {
         /// </summary>
         /// <param name="word">The word to check</param>
         /// <returns></returns>
-        public bool IsPalindrome(string word) {
-            throw new NotImplementedException();
+        public bool IsPalindrome(string word) 
+        {
+            var wordLowercase = word.ToLower();
+
+            return wordLowercase.SequenceEqual(wordLowercase.Reverse());
         }
 
         /// <summary>
-        /// Write a method that takes an enumerable list of objects and shuffles
-        /// them into a different order.
+        /// Write a method that takes an enumerable list of objects and 
+        /// shuffles them into a different order.
         ///
         /// For example:
         ///
@@ -139,10 +165,25 @@ namespace recordsure.interview {
         ///   "one"
         /// }
         /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public IEnumerable<object> Shuffle(IEnumerable<object> source) {
-            throw new NotImplementedException();
+        /// <param name="objects"></param>
+        /// <returns> Shuffled list of objects. </returns>
+        public IEnumerable<object> Shuffle(IEnumerable<object> objects) 
+        {
+            var randomNumberGenerator = new Random();
+            var shuffledObjects = new List<object>();
+            var shouldContinue = false;
+
+            do
+            {
+                shuffledObjects = objects.OrderBy(item => randomNumberGenerator.Next())
+                                         .ToList();
+
+                var haveSameFirstItems = shuffledObjects.FirstOrDefault().Equals(objects.FirstOrDefault());
+
+                shouldContinue = haveSameFirstItems && (objects.Count() != 1);
+            } while (shouldContinue);
+
+            return shuffledObjects;
         }
 
         /// <summary>
@@ -151,10 +192,28 @@ namespace recordsure.interview {
         ///
         /// Complete the test for this method.
         /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public int[] Sort(int[] source) {
-            throw new NotImplementedException();
+        /// <param name="integers"></param>
+        /// <returns> Array of sorted integers in an ascending order. </returns>
+        public int[] Sort(int[] integers) 
+        {
+            var valueHolder = 0;
+
+            for (var i = 0; i <= integers.Length - 1; i++)
+            {
+                for (var j = i + 1; j < integers.Length; j++)
+                {
+
+                    if (integers[i] > integers[j])
+                    {
+                        valueHolder = integers[i];
+
+                        integers[i] = integers[j];
+                        integers[j] = valueHolder;
+                    }
+                }
+            }
+
+            return integers;
         }
 
         /// <summary>
@@ -166,9 +225,41 @@ namespace recordsure.interview {
         /// By considering the terms in the Fibonacci sequence whose values do
         /// not exceed four million, find the sum of the even-valued terms.
         /// </summary>
-        /// <returns></returns>
-        public int FibonacciSum() {
-            throw new NotImplementedException();
+        /// <returns> The sum of even-valued terms in the Fibonacci sequence. </returns>
+        public int FibonacciSum() 
+        {
+            var counter = 2;
+            var shouldContinue = true;
+
+            var number = 0;
+            var nextNumber = 1;
+
+            var sumOfTerms = 0;
+            var sumOfEvenTerms = 0;
+
+            do
+            {
+                for (var i = 1; i < counter; i++)
+                {
+                    sumOfTerms = number + nextNumber;
+
+                    if (sumOfTerms % 2 == 0)
+                        sumOfEvenTerms += sumOfTerms;
+
+                    number = nextNumber;
+                    nextNumber = sumOfTerms;
+
+                    if (nextNumber > 4_000_000)
+                    {
+                        shouldContinue = false;
+                        break;
+                    }
+
+                    counter++;
+                }
+            } while (shouldContinue);
+
+            return sumOfEvenTerms;
         }
 
         /// <summary>
@@ -176,35 +267,10 @@ namespace recordsure.interview {
         ///
         /// This method is currently broken, fix it so that the tests pass.
         /// </summary>
-        /// <returns></returns>
-        public IEnumerable<int> GenerateList() {
-            var ret = new List<int>();
-            var numThreads = 2;
-
-            Thread[] threads = new Thread[numThreads];
-            for (var i = 0; i < numThreads; i++) {
-                threads[i] = new Thread(() => {
-                    var complete = false;
-                    while (!complete) {
-                        var next = ret.Count + 1;
-                        Thread.Sleep(new Random().Next(1, 10));
-                        if (next <= 100) {
-                            ret.Add(next);
-                        }
-
-                        if (ret.Count >= 100) {
-                            complete = true;
-                        }
-                    }
-                });
-                threads[i].Start();
-            }
-
-            for (var i = 0; i < numThreads; i++) {
-                threads[i].Join();
-            }
-
-            return ret;
+        /// <returns> A list of integers from 1 to 100. </returns>
+        public IEnumerable<int> GenerateList() 
+        {
+            return Enumerable.Range(1, 100);
         }
     }
 }

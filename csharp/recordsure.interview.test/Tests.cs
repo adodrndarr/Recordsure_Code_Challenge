@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 
@@ -82,10 +81,16 @@ namespace recordsure.interview.test
         [Test]
         public void IsPalindrome() {
             var palindromes = new List<string> {
-
+                "Anna",
+                "BOb",
+                "OTTO",
+                "hannah"
             };
             var invalid = new List<string> {
-
+                "Jenny",
+                "Giovanny",
+                "Shamar",
+                "Yadira"
             };
 
             foreach (var word in palindromes) {
@@ -103,8 +108,9 @@ namespace recordsure.interview.test
         }
 
         [Test]
-        public void CanSort() {
-            throw new NotImplementedException();
+        public void CanSort() 
+        {
+            Assert.AreEqual(new List<int> { 1, 2, 3 }, instance.Sort(new[] { 2, 1, 3 }));
         }
 
         [Test]
