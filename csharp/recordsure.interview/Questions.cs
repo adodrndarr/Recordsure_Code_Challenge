@@ -226,38 +226,27 @@ namespace recordsure.interview
         /// not exceed four million, find the sum of the even-valued terms.
         /// </summary>
         /// <returns> The sum of even-valued terms in the Fibonacci sequence. </returns>
-        public int FibonacciSum() 
+        public int FibonacciSum()
         {
-            var counter = 2;
-            var shouldContinue = true;
-
             var number = 0;
             var nextNumber = 1;
 
             var sumOfTerms = 0;
             var sumOfEvenTerms = 0;
 
-            do
+            while (true)
             {
-                for (var i = 1; i < counter; i++)
-                {
-                    sumOfTerms = number + nextNumber;
+                sumOfTerms = number + nextNumber;
 
-                    if (sumOfTerms % 2 == 0)
-                        sumOfEvenTerms += sumOfTerms;
+                if (sumOfTerms % 2 == 0)
+                    sumOfEvenTerms += sumOfTerms;
 
-                    number = nextNumber;
-                    nextNumber = sumOfTerms;
+                number = nextNumber;
+                nextNumber = sumOfTerms;
 
-                    if (nextNumber > 4_000_000)
-                    {
-                        shouldContinue = false;
-                        break;
-                    }
-
-                    counter++;
-                }
-            } while (shouldContinue);
+                if (nextNumber > 4_000_000)
+                    break;
+            }
 
             return sumOfEvenTerms;
         }
