@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace recordsure.interview
 {
-    public class Questions {
+    public class Questions
+    {
         /// <summary>
         /// Given an enumerable of strings, 
         /// 
@@ -26,14 +29,14 @@ namespace recordsure.interview
         /// </summary>
         /// <param name="strings">An enumerable containing words</param>
         /// <returns> List of numbers. </returns>
-        public IEnumerable<int> ExtractNumbers(IEnumerable<string> strings) 
+        public IEnumerable<int> ExtractNumbers(IEnumerable<string> strings)
         {
             var numbers = new List<int>();
 
             foreach (var stringItem in strings)
             {
                 var isInteger = int.TryParse(stringItem, out var number);
-
+                
                 if (isInteger)
                     numbers.Add(number);
             }
@@ -82,7 +85,7 @@ namespace recordsure.interview
         /// <param name="firstList">First list of words</param>
         /// <param name="secondList">Second list of words</param>
         /// <returns> Longest common word. </returns>
-        public string LongestCommonWord(IEnumerable<string> firstList, IEnumerable<string> secondList) 
+        public string LongestCommonWord(IEnumerable<string> firstList, IEnumerable<string> secondList)
         {
             var longestCommonWord = firstList.Intersect(secondList)
                                              .OrderByDescending(text => text.Length)
@@ -103,7 +106,7 @@ namespace recordsure.interview
         /// </summary>
         /// <param name="km">distance in kilometers</param>
         /// <returns> The distance in miles. </returns>
-        public double DistanceInMiles(double km) 
+        public double DistanceInMiles(double km)
         {
             return km / 1.6;
         }
@@ -143,7 +146,7 @@ namespace recordsure.interview
         /// </summary>
         /// <param name="word">The word to check</param>
         /// <returns></returns>
-        public bool IsPalindrome(string word) 
+        public bool IsPalindrome(string word)
         {
             var wordLowercase = word.ToLower();
 
@@ -167,7 +170,7 @@ namespace recordsure.interview
         /// </summary>
         /// <param name="objects"></param>
         /// <returns> Shuffled list of objects. </returns>
-        public IEnumerable<object> Shuffle(IEnumerable<object> objects) 
+        public IEnumerable<object> Shuffle(IEnumerable<object> objects)
         {
             var randomNumberGenerator = new Random();
             var shuffledObjects = new List<object>();
@@ -194,7 +197,7 @@ namespace recordsure.interview
         /// </summary>
         /// <param name="integers"></param>
         /// <returns> Array of sorted integers in an ascending order. </returns>
-        public int[] Sort(int[] integers) 
+        public int[] Sort(int[] integers)
         {
             var valueHolder = 0;
 
@@ -234,7 +237,7 @@ namespace recordsure.interview
             var sumOfTerms = 0;
             var sumOfEvenTerms = 0;
 
-            while (true)
+            while (nextNumber < 4_000_000)
             {
                 sumOfTerms = number + nextNumber;
 
@@ -243,9 +246,6 @@ namespace recordsure.interview
 
                 number = nextNumber;
                 nextNumber = sumOfTerms;
-
-                if (nextNumber > 4_000_000)
-                    break;
             }
 
             return sumOfEvenTerms;
@@ -257,9 +257,58 @@ namespace recordsure.interview
         /// This method is currently broken, fix it so that the tests pass.
         /// </summary>
         /// <returns> A list of integers from 1 to 100. </returns>
-        public IEnumerable<int> GenerateList() 
+        public IEnumerable<int> GenerateList()
         {
             return Enumerable.Range(1, 100);
         }
+
+        #region GenerateList2
+        static readonly ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim();
+
+        public IEnumerable<int> GenerateList2()
+        {
+            var numberOfThreads = 2;
+            var threads = new Thread[numberOfThreads];
+
+            var integers = new List<int>();
+            var populateIntegers = new PopulateIntegersType(PopulateIntegers);
+
+            for (var i = 0; i < numberOfThreads; i++)
+            {
+                threads[i] = new Thread(() => populateIntegers(integers));
+                threads[i].Start();
+            }
+
+            foreach (var thread in threads)
+                thread.Join();
+
+            return integers;
+        }
+
+        public delegate void PopulateIntegersType(List<int> integers);
+
+        public void PopulateIntegers(List<int> integers)
+        {
+            while (true)
+            {
+                rwLock.EnterWriteLock();
+                try
+                {
+                    var nextNumber = integers.Count + 1;
+
+                    if (nextNumber <= 100)
+                        integers.Add(nextNumber);
+                    else
+                        break;
+                }
+                finally
+                {
+                    rwLock.ExitWriteLock();
+                }
+
+                //Thread.Sleep(new Random().Next(1, 10)); // Simulate thread processing time (1 vs more threads)...
+            }
+        }
+        #endregion
     }
 }

@@ -110,7 +110,7 @@ namespace recordsure.interview.test
         [Test]
         public void CanSort() 
         {
-            Assert.AreEqual(new List<int> { 1, 2, 3 }, instance.Sort(new[] { 2, 1, 3 }));
+            Assert.AreEqual(new int[] { 1, 2, 3 }, instance.Sort(new[] { 2, 1, 3 }));
         }
 
         [Test]
@@ -119,11 +119,13 @@ namespace recordsure.interview.test
         }
 
         [Test]
-        public void CanGenerateListOfNumbers() {
+        public void CanGenerateListOfNumbers() 
+        {
             var list = instance.GenerateList();
-
             var current = 1;
-            foreach (var num in list) {
+
+            foreach (var num in list) 
+            {
                 Assert.AreEqual(current, num);
                 current++;
             }
